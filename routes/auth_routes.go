@@ -6,8 +6,9 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// SetupRoutes ajoute toutes les routes de l'API
 func SetupRoutes(router *gin.Engine) {
-	// Route de santé
 	router.GET("/health", controllers.HealthCheck)
+
+	router.POST("/register", controllers.Register)
+	router.POST("/login", controllers.Login)
 }
