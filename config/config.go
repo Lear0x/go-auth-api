@@ -5,7 +5,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/Lear0x/go-auth-api/models"
+	"github.com/Lear0x/go-auth-api/internal/models"
 	"github.com/joho/godotenv"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
