@@ -36,7 +36,7 @@ func ConnectDB() {
 	var err error
 
 	// Récupérer l'URL de connexion depuis .env
-	dsn := GetEnv("DB_URL", "host=localhost user=postgres password=yourpassword dbname=goauth sslmode=disable")
+	dsn := GetEnv("DB_URL", "host=postgres user=admin password=pass dbname=authdb sslmode=disable")
 
 	// Initialiser la connexion avec GORM
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
