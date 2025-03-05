@@ -11,10 +11,8 @@ import (
 	"gorm.io/gorm"
 )
 
-// Variable globale pour la base de données
 var DB *gorm.DB
 
-// LoadEnv charge les variables d'environnement depuis un fichier .env
 func LoadEnv() {
 	err := godotenv.Load()
 	if err != nil {
@@ -22,7 +20,6 @@ func LoadEnv() {
 	}
 }
 
-// GetEnv récupère une variable d'environnement avec une valeur par défaut
 func GetEnv(key, defaultValue string) string {
 	value, exists := os.LookupEnv(key)
 	if !exists {
@@ -31,22 +28,18 @@ func GetEnv(key, defaultValue string) string {
 	return value
 }
 
-// ConnectDB établit la connexion à la base de données PostgreSQL
 func ConnectDB() {
 	var err error
 	var err2 error
 
-	// Récupérer l'URL de connexion depuis .env
 	dsn := GetEnv("DB_URL", "host=postgres user=admin password=pass dbname=authdb sslmode=disable")
 
-	// Initialiser la connexion avec GORM
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("❌ Impossible de se connecter à la base de données :", err)
 	} else {
 		fmt.Println("✅ Connexion à la base de données réussie !")
 
-		// Auto-migration pour créer la table users
 		err = DB.AutoMigrate(&models.User{})
 		err2 = DB.AutoMigrate(&models.BlacklistedToken{})
 		if err != nil {
