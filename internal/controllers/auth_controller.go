@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/Lear0x/go-auth-api/config"
@@ -179,19 +180,25 @@ func ResetPassword(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	userID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non authentifié"})
+	// Récupérer le token de l'Authorization Header
+	authHeader := c.GetHeader("Authorization")
+	if authHeader == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token manquant"})
 		return
 	}
 
-	var user models.User
-	if err := config.DB.First(&user, userID).Error; err != nil {
-		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
+	// Extraire le token (supprimer "Bearer ")
+	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+	if tokenString == authHeader {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Format du token invalide"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie. Veuillez supprimer votre token côté client."})
+	// Ajouter le token à la base de données (blacklist)
+	blacklistedToken := models.BlacklistedToken{Token: tokenString}
+	config.DB.Create(&blacklistedToken)
+
+	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie. Token ajouté à la blacklist."})
 }
 
 func Me(c *gin.Context) {

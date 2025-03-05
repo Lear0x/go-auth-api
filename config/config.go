@@ -34,6 +34,7 @@ func GetEnv(key, defaultValue string) string {
 // ConnectDB établit la connexion à la base de données PostgreSQL
 func ConnectDB() {
 	var err error
+	var err2 error
 
 	// Récupérer l'URL de connexion depuis .env
 	dsn := GetEnv("DB_URL", "host=postgres user=admin password=pass dbname=authdb sslmode=disable")
@@ -47,8 +48,15 @@ func ConnectDB() {
 
 		// Auto-migration pour créer la table users
 		err = DB.AutoMigrate(&models.User{})
+		err2 = DB.AutoMigrate(&models.BlacklistedToken{})
 		if err != nil {
 			log.Fatal("❌ Erreur lors de la migration :", err)
+		} else {
+			fmt.Println("✅ Migration terminée avec succès !")
+		}
+
+		if err2 != nil {
+			log.Fatal("❌ Erreur lors de la migration :", err2)
 		} else {
 			fmt.Println("✅ Migration terminée avec succès !")
 		}
