@@ -1,4 +1,4 @@
-version: '3.8'
+version: "3.8"
 
 services:
   # Service de l'application Go
@@ -11,7 +11,8 @@ services:
     environment:
       - DATABASE_URL=postgres://admin:pass@db:5432/authdb?sslmode=disable
     depends_on:
-      - db
+      db:
+        condition: service_healthy # Ajout de la condition
     networks:
       - app-network
     env_file:
@@ -31,7 +32,7 @@ services:
     networks:
       - app-network
     healthcheck:
-      test: ["CMD", "pg_isready", "-U", "user", "-d", "authdb"]
+      test: ["CMD", "pg_isready", "-U", "admin", "-d", "authdb"]
       interval: 10s
       retries: 5
       start_period: 5s
