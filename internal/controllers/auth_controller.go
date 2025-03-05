@@ -33,8 +33,6 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("Mot de passe APRÈS hachage :", user.Password)
-
 	if err := config.DB.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur d'enregistrement"})
 		return
@@ -55,17 +53,11 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	fmt.Println("📥 Email reçu :", input.Email)
-	fmt.Println("📥 Mot de passe reçu :", input.Password)
-
 	var user models.User
 	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non trouvé"})
 		return
 	}
-
-	fmt.Println("🔍 Utilisateur trouvé :", user.Email)
-	fmt.Println("🔍 Mot de passe récupéré en base :", user.Password)
 
 	if !user.CheckPassword(input.Password) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Mot de passe incorrect"})
@@ -152,14 +144,11 @@ func ResetPassword(c *gin.Context) {
 
 	userID := uint(claims["sub"].(float64))
 
-	// Récupérer l'utilisateur
 	var user models.User
 	if err := config.DB.First(&user, userID).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
 		return
 	}
-
-	fmt.Println("🔍 Ancien mot de passe en base :", user.Password)
 
 	user.Password = input.NewPassword
 	if err := user.HashPassword(); err != nil {
@@ -167,10 +156,6 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// 🔍 Vérifier après hachage
-	fmt.Println("🔐 Nouveau mot de passe haché :", user.Password)
-
-	// Mettre à jour le mot de passe en base
 	if err := config.DB.Model(&user).Update("password", user.Password).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Impossible de mettre à jour le mot de passe"})
 		return
@@ -180,21 +165,19 @@ func ResetPassword(c *gin.Context) {
 }
 
 func Logout(c *gin.Context) {
-	// Récupérer le token de l'Authorization Header
+
 	authHeader := c.GetHeader("Authorization")
 	if authHeader == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token manquant"})
 		return
 	}
 
-	// Extraire le token (supprimer "Bearer ")
 	tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 	if tokenString == authHeader {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Format du token invalide"})
 		return
 	}
 
-	// Ajouter le token à la base de données (blacklist)
 	blacklistedToken := models.BlacklistedToken{Token: tokenString}
 	config.DB.Create(&blacklistedToken)
 

@@ -25,7 +25,6 @@ func main() {
 
 	port := config.GetEnv("PORT", "8080")
 
-	// Lancer le serveur
 	log.Printf("🚀 Serveur démarré sur http://localhost:%s\n", port)
 	err = http.ListenAndServe(":"+port, router)
 	if err != nil {
