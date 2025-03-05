@@ -49,11 +49,11 @@ package controllers
 // 		return
 // 	}
 
-// 	token, err := utils.GenerateToken(user.ID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de génération du token"})
-// 		return
-// 	}
+// 	// token, err := utils.GenerateToken(user.ID)
+// 	// if err != nil {
+// 	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de génération du token"})
+// 	// 	return
+// 	// }
 
-// 	c.JSON(http.StatusOK, gin.H{"token": token})
-// }
+	//c.JSON(http.StatusOK, gin.H{"token": token})
+//}
