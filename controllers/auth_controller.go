@@ -1,33 +1,34 @@
 package controllers
 
-import (
-	"net/http"
+// import (
+// 	"net/http"
 
-	"github.com/Lear0x/go-auth-api/config"
-	"github.com/Lear0x/go-auth-api/models"
+// 	"github.com/Lear0x/go-auth-api/config"
+// 	"github.com/Lear0x/go-auth-api/models"
+// 	"github.com/Lear0x/go-auth-api/utils"
 
-	"github.com/gin-gonic/gin"
-)
+// 	"github.com/gin-gonic/gin"
+// )
 
-func Register(c *gin.Context) {
-	var user models.User
-	if err := c.ShouldBindJSON(&user); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "Données invalides"})
-		return
-	}
+// func Register(c *gin.Context) {
+// 	var user models.User
+// 	if err := c.ShouldBindJSON(&user); err != nil {
+// 		c.JSON(http.StatusBadRequest, gin.H{"error": "Données invalides"})
+// 		return
+// 	}
 
-	if err := user.HashPassword(); err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de hachage du mot de passe"})
-		return
-	}
+// 	if err := user.HashPassword(); err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de hachage du mot de passe"})
+// 		return
+// 	}
 
-	if err := config.DB.Create(&user).Error; err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur d'enregistrement"})
-		return
-	}
+// 	if err := config.DB.Create(&user).Error; err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur d'enregistrement"})
+// 		return
+// 	}
 
-	c.JSON(http.StatusCreated, gin.H{"message": "Utilisateur créé"})
-}
+// 	c.JSON(http.StatusCreated, gin.H{"message": "Utilisateur créé"})
+// }
 
 // func Login(c *gin.Context) {
 // 	var input models.User
