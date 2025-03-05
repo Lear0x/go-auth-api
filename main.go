@@ -5,7 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Lear0x/go-auth-api/config"
-	"github.com/Lear0x/go-auth-api/routes"
+	"github.com/Lear0x/go-auth-api/internal/routes"
 
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
