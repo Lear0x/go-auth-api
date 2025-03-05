@@ -12,19 +12,15 @@ import (
 )
 
 func main() {
-	// Charger les variables d'environnement
 	err := godotenv.Load()
 	if err != nil {
 		log.Println("⚠️  Fichier .env non trouvé, chargement ignoré")
 	}
 
-	// Initialisation du routeur Gin
 	router := gin.Default()
 
-	// Ajouter les routes
 	routes.SetupRoutes(router)
 
-	// Récupérer le port depuis .env (par défaut : 8080)
 	port := config.GetEnv("PORT", "8080")
 
 	// Lancer le serveur
