@@ -21,14 +21,12 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// Vérifier si l'utilisateur existe déjà
 	var existingUser models.User
 	if err := config.DB.Where("email = ?", user.Email).First(&existingUser).Error; err == nil {
 		c.JSON(http.StatusConflict, gin.H{"error": "Cet email est déjà utilisé"})
 		return
 	}
 
-	// Hasher le mot de passe avant de l'enregistrer
 	if err := user.HashPassword(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de hachage du mot de passe"})
 		return
@@ -36,7 +34,6 @@ func Register(c *gin.Context) {
 
 	fmt.Println("Mot de passe APRÈS hachage :", user.Password)
 
-	// Enregistrer l'utilisateur en base de données
 	if err := config.DB.Create(&user).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur d'enregistrement"})
 		return
@@ -93,14 +90,12 @@ func ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	// Vérifier si l'utilisateur existe
 	var user models.User
 	if err := config.DB.Where("email = ?", input.Email).First(&user).Error; err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
 		return
 	}
 
-	// Générer un token temporaire (expire en 30 minutes)
 	expirationTime := time.Now().Add(30 * time.Minute).Unix()
 	secretKey := os.Getenv("JWT_SECRET")
 
@@ -115,19 +110,15 @@ func ForgotPassword(c *gin.Context) {
 		return
 	}
 
-	// 🔹 Normalement ici, on enverrait un email avec le lien contenant ce token.
-	// Pour tester, on va juste afficher le token en réponse.
 	resetLink := fmt.Sprintf("http://localhost:8080/reset-password?token=%s", tokenString)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message":     "Un lien de réinitialisation a été envoyé",
-		"reset_token": tokenString, // À remplacer par un vrai envoi d'email plus tard
-		"reset_link":  resetLink,   // Juste pour test
+		"reset_token": tokenString,
+		"reset_link":  resetLink,
 	})
 }
 
-// ResetPassword vérifie le token et met à jour le mot de passe
-// ResetPassword met à jour le mot de passe après vérification du token
 func ResetPassword(c *gin.Context) {
 	var input struct {
 		Token       string `json:"token" binding:"required"`
@@ -139,7 +130,6 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// Vérifier le token
 	secretKey := os.Getenv("JWT_SECRET")
 	token, err := jwt.Parse(input.Token, func(token *jwt.Token) (interface{}, error) {
 		if _, ok := token.Method.(*jwt.SigningMethodHMAC); !ok {
@@ -159,7 +149,6 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// Récupérer l'ID utilisateur depuis le token
 	userID := uint(claims["sub"].(float64))
 
 	// Récupérer l'utilisateur
@@ -169,10 +158,8 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	// 🔍 Vérifier avant mise à jour
 	fmt.Println("🔍 Ancien mot de passe en base :", user.Password)
 
-	// Hacher le nouveau mot de passe
 	user.Password = input.NewPassword
 	if err := user.HashPassword(); err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur lors du hachage du mot de passe"})
@@ -189,4 +176,40 @@ func ResetPassword(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"message": "Mot de passe mis à jour avec succès"})
+}
+
+func Logout(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non authentifié"})
+		return
+	}
+
+	var user models.User
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie. Veuillez supprimer votre token côté client."})
+}
+
+func Me(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Utilisateur non authentifié"})
+		return
+	}
+
+	var user models.User
+	if err := config.DB.First(&user, userID).Error; err != nil {
+		c.JSON(http.StatusNotFound, gin.H{"error": "Utilisateur non trouvé"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"id":    user.ID,
+		"name":  user.Name,
+		"email": user.Email,
+	})
 }
