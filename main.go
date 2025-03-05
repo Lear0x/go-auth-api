@@ -17,6 +17,8 @@ func main() {
 		log.Println("⚠️  Fichier .env non trouvé, chargement ignoré")
 	}
 
+	config.ConnectDB()
+
 	router := gin.Default()
 
 	routes.SetupRoutes(router)

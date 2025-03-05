@@ -10,5 +10,5 @@ func SetupRoutes(router *gin.Engine) {
 	router.GET("/health", controllers.HealthCheck)
 
 	router.POST("/register", controllers.Register)
-	router.POST("/login", controllers.Login)
+	// router.POST("/login", controllers.Login)
 }
