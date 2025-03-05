@@ -14,8 +14,10 @@ func SetupRoutes(router *gin.Engine) {
 	router.POST("/forgot-password", controllers.ForgotPassword)
 	router.POST("/reset-password", controllers.ResetPassword)
 
-	protected := router.Group("/")
+	protected := router.Group("/user")
 	protected.Use(middlewares.AuthMiddleware())
-	protected.POST("/logout", controllers.Logout)
-	protected.GET("/me", controllers.Me)
+	{
+		protected.GET("/me", controllers.Me)
+		protected.POST("/logout", controllers.Logout)
+	}
 }
