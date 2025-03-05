@@ -5,7 +5,7 @@ import (
 
 	"github.com/Lear0x/go-auth-api/config"
 	"github.com/Lear0x/go-auth-api/models"
-	"github.com/Lear0x/go-auth-api/utils"
+	// "github.com/Lear0x/go-auth-api/utils"
 
 	"github.com/gin-gonic/gin"
 )
@@ -49,11 +49,11 @@ func Login(c *gin.Context) {
 		return
 	}
 
-	token, err := utils.GenerateToken(user.ID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de génération du token"})
-		return
-	}
+	// token, err := utils.GenerateToken(user.ID)
+	// if err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Erreur de génération du token"})
+	// 	return
+	// }
 
-	c.JSON(http.StatusOK, gin.H{"token": token})
+	// c.JSON(http.StatusOK, gin.H{"token": token})
 }
