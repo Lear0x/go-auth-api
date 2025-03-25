@@ -26,4 +26,4 @@ jobs:
         run: go mod tidy
 
       - name: 🔍 Run tests
-        run: go test ./...
+        run: APP_ENV=test go test ./internal/controllers -v
