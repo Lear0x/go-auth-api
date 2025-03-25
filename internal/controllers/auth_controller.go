@@ -161,6 +161,12 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
+	blacklistedToken := models.BlacklistedToken{Token: input.Token}
+	if err := config.DB.Create(&blacklistedToken).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Impossible de blacklister le token"})
+		return
+	}
+
 	c.Status(http.StatusNoContent)
 }
 
