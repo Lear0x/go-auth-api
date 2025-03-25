@@ -33,6 +33,9 @@ func ConnectDB() {
 	var err2 error
 
 	dsn := GetEnv("DB_URL", "postgresql://admin:leV5DcjOuLWelbSGxOhbwNTSssvlfzTw@dpg-cvh6ncjv2p9s7382jsmg-a.frankfurt-postgres.render.com:5432/authdb_5kw2")
+	if os.Getenv("APP_ENV") == "test" {
+		dsn = GetEnv("TEST_DATABASE_URL", "host=postgres user=admin password=pass dbname=authdb_test sslmode=disable")
+	}
 
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {

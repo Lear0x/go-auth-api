@@ -24,7 +24,8 @@ services:
     environment:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: pass
-      POSTGRES_DB: authdb
+      POSTGRES_DB: authdb,
+      POSTGRES_MULTIPLE_DATABASES: authdb, authdb_test
     volumes:
       - postgres_data:/var/lib/postgresql/data
     ports:
