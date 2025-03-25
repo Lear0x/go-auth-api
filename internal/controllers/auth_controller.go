@@ -136,6 +136,12 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
+	var blacklistedToken models.BlacklistedToken
+	if err := config.DB.Where("token = ?", input.Token).First(&blacklistedToken).Error; err == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expiré ou déjà utilisé"})
+		return
+	}
+
 	claims, ok := token.Claims.(jwt.MapClaims)
 	if !ok {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token corrompu"})
@@ -161,11 +167,17 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	blacklistedToken := models.BlacklistedToken{Token: input.Token}
-	if err := config.DB.Create(&blacklistedToken).Error; err != nil {
+	// blacklistedToken := models.BlacklistedToken{Token: input.Token}
+	// if err := config.DB.Create(&blacklistedToken).Error; err != nil {
+	// 	c.JSON(http.StatusInternalServerError, gin.H{"error": "Impossible de blacklister le token"})
+	// 	return
+	// }
+
+	if err := config.DB.Create(&models.BlacklistedToken{Token: input.Token}).Error; err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Impossible de blacklister le token"})
 		return
 	}
+	fmt.Println("Token blacklisted")
 
 	c.Status(http.StatusNoContent)
 }
