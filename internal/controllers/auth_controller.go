@@ -161,7 +161,7 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Mot de passe mis à jour avec succès"})
+	c.Status(http.StatusNoContent)
 }
 
 func Logout(c *gin.Context) {
