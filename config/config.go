@@ -34,6 +34,12 @@ func ConnectDB() {
 
 	dsn := GetEnv("DB_URL", "postgresql://admin:leV5DcjOuLWelbSGxOhbwNTSssvlfzTw@dpg-cvh6ncjv2p9s7382jsmg-a.frankfurt-postgres.render.com:5432/authdb_5kw2")
 
+	if os.Getenv("APP_ENV") == "test" {
+		dsn = GetEnv("TEST_DATABASE_URL", "host=localhost user=admin password=pass dbname=authdb sslmode=disable")
+		fmt.Println("🧪 Connexion à la base de test :", dsn)
+	}
+	fmt.Println("🧪 Connexion à la base de test :", dsn)
+
 	DB, err = gorm.Open(postgres.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("❌ Impossible de se connecter à la base de données :", err)
