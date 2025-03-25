@@ -181,7 +181,7 @@ func Logout(c *gin.Context) {
 	blacklistedToken := models.BlacklistedToken{Token: tokenString}
 	config.DB.Create(&blacklistedToken)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie. Token ajouté à la blacklist."})
+	c.Status(http.StatusNoContent)
 }
 
 func Me(c *gin.Context) {
