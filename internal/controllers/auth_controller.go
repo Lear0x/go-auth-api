@@ -106,9 +106,9 @@ func ForgotPassword(c *gin.Context) {
 	resetLink := fmt.Sprintf("http://localhost:8080/reset-password?token=%s", tokenString)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Un lien de réinitialisation a été envoyé",
-		"reset_token": tokenString,
-		"reset_link":  resetLink,
+		"message":    "Un lien de réinitialisation a été envoyé",
+		"token":      tokenString,
+		"reset_link": resetLink,
 	})
 }
 
