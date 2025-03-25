@@ -106,9 +106,9 @@ func ForgotPassword(c *gin.Context) {
 	resetLink := fmt.Sprintf("http://localhost:8080/reset-password?token=%s", tokenString)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message":     "Un lien de réinitialisation a été envoyé",
-		"reset_token": tokenString,
-		"reset_link":  resetLink,
+		"message":    "Un lien de réinitialisation a été envoyé",
+		"token":      tokenString,
+		"reset_link": resetLink,
 	})
 }
 
@@ -133,6 +133,12 @@ func ResetPassword(c *gin.Context) {
 
 	if err != nil || !token.Valid {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token invalide ou expiré"})
+		return
+	}
+
+	var blacklistedToken models.BlacklistedToken
+	if err := config.DB.Where("token = ?", input.Token).First(&blacklistedToken).Error; err == nil {
+		c.JSON(http.StatusUnauthorized, gin.H{"error": "Token expiré ou déjà utilisé"})
 		return
 	}
 
@@ -161,7 +167,13 @@ func ResetPassword(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"message": "Mot de passe mis à jour avec succès"})
+	if err := config.DB.Create(&models.BlacklistedToken{Token: input.Token}).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Impossible de blacklister le token"})
+		return
+	}
+	fmt.Println("Token blacklisted")
+
+	c.Status(http.StatusNoContent)
 }
 
 func Logout(c *gin.Context) {
@@ -181,7 +193,7 @@ func Logout(c *gin.Context) {
 	blacklistedToken := models.BlacklistedToken{Token: tokenString}
 	config.DB.Create(&blacklistedToken)
 
-	c.JSON(http.StatusOK, gin.H{"message": "Déconnexion réussie. Token ajouté à la blacklist."})
+	c.Status(http.StatusNoContent)
 }
 
 func Me(c *gin.Context) {
