@@ -8,6 +8,8 @@ import (
 	"os"
 	"testing"
 
+	controller "github.com/Lear0x/go-auth-api/internal/controllers"
+
 	"github.com/Lear0x/go-auth-api/config"
 	"github.com/gin-gonic/gin"
 	"github.com/stretchr/testify/assert"
@@ -23,8 +25,8 @@ func setupTestRouter() *gin.Engine {
 
 	api := r.Group("/19ebe88a-e0ce-42bc-8dcf-d5206d0658ad")
 	{
-		api.POST("/register", Register)
-		api.POST("/login", Login)
+		api.POST("/register", controller.Register)
+		api.POST("/login", controller.Login)
 	}
 
 	return r
